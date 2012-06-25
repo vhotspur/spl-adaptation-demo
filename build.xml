@@ -20,7 +20,7 @@
 	        classpath="${lib.dir}/org.apache.felix.ipojo.ant-1.8.0.jar" />
 	
 	<target name="all"
-		depends="clean,package.interfaces,package.store,package.client,package.env">
+		depends="clean,package.interfaces,package.store,package.client,package.database,package.env">
 		<!--
 		Need to clean first, IPOJO bytecode manipulation breaks
 		when applied twice.
@@ -37,7 +37,7 @@
 			destdir="${class.dir}"
 			classpathref="classpath"
 			includeantruntime="false"
-			srcdir="services/:store/:client/"
+			srcdir="services/:store/:client/:database/"
 		>
 			<compilerarg value="-Xlint:all"/>
 		</javac>
@@ -84,6 +84,19 @@
 		/>
 		<ipojo
 			input="${output.dir}/client.jar"
+		/>
+	</target>
+	
+	<target name="package.database" depends="compile">
+		<bnd
+			classpath="${class.dir}"
+			failok="false"
+			exceptions="true"
+			files="database/database.bnd"
+			output="${output.dir}"
+		/>
+		<ipojo
+			input="${output.dir}/database.jar"
 		/>
 	</target>
 

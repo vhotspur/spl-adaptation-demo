@@ -1,0 +1,3 @@
+Export-Package: cz.cuni.mff.d3s.adapt.bookstore.database.*
+Import-Package: cz.cuni.mff.d3s.adapt.bookstore.services.*
+Bundle-Version: 0.0.1

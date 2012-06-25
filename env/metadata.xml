@@ -7,4 +7,8 @@
 		component="cz.cuni.mff.d3s.adapt.bookstore.client.SimpleClient"
 		name="CLIENT"
 	/>
+	<instance
+		component="cz.cuni.mff.d3s.adapt.bookstore.database.FileBasedDatabase"
+		name="DATABASE"
+	/>
 </ipojo>
