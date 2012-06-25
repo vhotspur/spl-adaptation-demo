@@ -1,0 +1,8 @@
+# Directory with generated files
+output/
+
+# Eclipse & Ant related files
+.ant-targets-build.xml
+.project
+.classpath
+

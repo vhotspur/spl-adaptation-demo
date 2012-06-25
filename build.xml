@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<project name="Book Store" default="all" basedir=".">
+	
+	<property name="lib.dir" value="lib" />
+	<property name="output.dir" value="output" />
+	<property name="class.dir" value="${output.dir}/classes" />
+	<property name="felix.cache.dir" value="felix-cache" />
+	
+	<path id="classpath">
+		<pathelement location="${classes.dir}" />
+		<path location="${lib.dir}/org.apache.felix.ipojo-1.8.0.jar" />
+		<path location="${lib.dir}/org.apache.felix.ipojo.annotations-1.8.0.jar" />
+	</path>
+	
+	<taskdef resource="aQute/bnd/ant/taskdef.properties"
+	      classpath="${lib.dir}/bnd-0.0.401.jar"/>
+
+	<taskdef name="ipojo"
+		classname="org.apache.felix.ipojo.task.IPojoTask"
+	        classpath="${lib.dir}/org.apache.felix.ipojo.ant-1.8.0.jar" />
+	
+	<target name="all"
+		depends="clean,package.interfaces,package.store,package.client,package.env">
+		<!--
+		Need to clean first, IPOJO bytecode manipulation breaks
+		when applied twice.
+		-->
+	</target>
+	
+	<target name="clean">
+		<delete dir="${output.dir}" />
+		<delete dir="felix/${felix.cache.dir}" />
+	</target>
+	
+	<target name="compile" depends="prepare">
+		<javac
+			destdir="${class.dir}"
+			classpathref="classpath"
+			includeantruntime="false"
+			srcdir="services/:store/:client/"
+		>
+			<compilerarg value="-Xlint:all"/>
+		</javac>
+	</target>
+	
+	<target name="prepare">
+		<mkdir dir="${output.dir}" />
+		<mkdir dir="${class.dir}" />
+	</target>
+	
+	<target name="package.interfaces" depends="compile">
+		<bnd
+			classpath="${class.dir}"
+			failok="false"
+			exceptions="true"
+			files="services/services.bnd"
+			output="${output.dir}"
+		/>
+		<ipojo
+			input="${output.dir}/services.jar"
+		/>
+	</target>
+	
+	<target name="package.store" depends="compile">
+		<bnd
+			classpath="${class.dir}"
+			failok="false"
+			exceptions="true"
+			files="store/store.bnd"
+			output="${output.dir}"
+		/>
+		<ipojo
+			input="${output.dir}/store.jar"
+		/>
+	</target>
+	
+	<target name="package.client" depends="compile">
+		<bnd
+			classpath="${class.dir}"
+			failok="false"
+			exceptions="true"
+			files="client/client.bnd"
+			output="${output.dir}"
+		/>
+		<ipojo
+			input="${output.dir}/client.jar"
+		/>
+	</target>
+
+	<target name="package.env" depends="compile">
+		<bnd
+			classpath="${class.dir}"
+			failok="false"
+			exceptions="true"
+			files="env/env.bnd"
+			output="${output.dir}"
+		/>
+		<ipojo
+			input="${output.dir}/env.jar"
+			metadata="env/metadata.xml"
+		/>
+	</target>
+	
+	<target name="run" depends="all,_run">
+	</target>
+	
+	<target name="_run">
+		<java
+			jar="felix/bin/felix.jar"
+			dir="felix"
+			fork="true"
+		>
+			<jvmarg value="-XX:-UseSplitVerifier" />
+			<jvmarg value="-ea" />
+			<arg value="${felix.cache.dir}" />
+		</java>
+	</target>
+
+</project>

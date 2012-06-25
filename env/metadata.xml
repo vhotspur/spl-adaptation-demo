@@ -1,0 +1,10 @@
+<ipojo>
+	<instance
+		component="cz.cuni.mff.d3s.adapt.bookstore.store.SimpleBookStore"
+		name="STORE"
+	/>
+	<instance
+		component="cz.cuni.mff.d3s.adapt.bookstore.client.SimpleClient"
+		name="CLIENT"
+	/>
+</ipojo>
