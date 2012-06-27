@@ -60,6 +60,7 @@ public class SimpleClient implements Runnable {
 	
 	@Validate
 	public void start() {
-		run();
+		Thread thread = new Thread(this);
+		thread.start();
 	}
 }
