@@ -3,6 +3,7 @@ package cz.cuni.mff.d3s.adapt.bookstore.agent.data;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,30 +44,30 @@ public class InMemoryMeasurement implements Measurement {
 	}
 	
 	@Override
-	public void add(String probe, long time) {
+	public synchronized void add(String probe, long time) {
 		ProbeData pd = getProbeData(probe);
 		pd.add(time);
 	}
 
 	@Override
-	public void add(String probe, long time, long clock) {
+	public synchronized void add(String probe, long time, long clock) {
 		ProbeData pd = getProbeData(probe);
 		pd.add(time, clock);
 	}
 
 	@Override
-	public Collection<Long> get(String probe) {
+	public synchronized Collection<Long> get(String probe) {
 		ProbeData pd = getProbeData(probe);
-		return pd.getNonClockData();
+		return Collections.unmodifiableCollection(pd.getNonClockData());
 	}
 
 	@Override
-	public Collection<Long> get(String probe, long startTime, long endTime) {
+	public synchronized Collection<Long> get(String probe, long startTime, long endTime) {
 		ProbeData pd = getProbeData(probe);
-		return pd.getClockData(startTime, endTime);
+		return Collections.unmodifiableCollection(pd.getClockData(startTime, endTime));
 	}
 	
-	protected ProbeData getProbeData(String id) {
+	protected synchronized ProbeData getProbeData(String id) {
 		ProbeData d = data.get(id);
 		if (d == null) {
 			d = new ProbeData();
@@ -77,24 +78,28 @@ public class InMemoryMeasurement implements Measurement {
 
 	@Override
 	public void dump(Writer output) throws IOException {
-		output.write("InMemoryMeasurements:\n");
-		for (Map.Entry<String, ProbeData> entry : data.entrySet()) {
-			ProbeData pd = entry.getValue();
-			Collection<Long> nonClockData = pd.getNonClockData();
-			Collection<Long> clockData = pd.getClockData();
-			output.write(String.format("  %s: any=%d, clock=%d\n", entry.getKey(),
-					nonClockData.size(), clockData.size()));
-			output.write("   Non-clock: ");
-			for (Long l : nonClockData) {
-				output.write(String.format(" %d", l));
+		StringBuilder result = new StringBuilder();
+		result.append("InMemoryMeasurements:\n");
+		synchronized (this) {
+			for (Map.Entry<String, ProbeData> entry : data.entrySet()) {
+				ProbeData pd = entry.getValue();
+				Collection<Long> nonClockData = pd.getNonClockData();
+				Collection<Long> clockData = pd.getClockData();
+				result.append(String.format("  %s: any=%d, clock=%d\n", entry.getKey(),
+						nonClockData.size(), clockData.size()));
+				result.append("   Non-clock: ");
+				for (Long l : nonClockData) {
+					result.append(String.format(" %d", l));
+				}
+				result.append("\n   Clock:    ");
+				for (Long l : clockData) {
+					result.append(String.format(" %d", l));
+				}
+				result.append("\n");
 			}
-			output.write("\n   Clock:    ");
-			for (Long l : clockData) {
-				output.write(String.format(" %d", l));
-			}
-			output.write("\n");
 		}
-		output.write("---------------------\n");
+		result.append("---------------------\n");
+		output.write(result.toString());
 		output.flush();
 	}
 
