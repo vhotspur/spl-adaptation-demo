@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.adapt.bookstore.agent;
 
+import cz.cuni.mff.d3s.adapt.bookstore.agent.data.MeasurementStorage;
 import ch.usi.dag.disl.annotation.After;
 import ch.usi.dag.disl.annotation.Before;
 import ch.usi.dag.disl.annotation.SyntheticLocal;
@@ -18,10 +19,10 @@ public class Snippets {
 	@After(marker = BodyMarker.class, guard = InstrumentationAgent.class)
 	public static void endMeasureAnnounceResults(MethodStaticContext sc) {
 		long now = System.nanoTime();
-		long runLengthUs = (now - startTime) / 1000;
+		long runLengthNanos = (now - startTime);
 		
 		String id = "class:" + sc.thisClassName() + "#" + sc.thisMethodName();
 		
-		System.err.printf(">>> %s: %dus\n", id, runLengthUs);		
+		MeasurementStorage.recordMeasurement(id, runLengthNanos);
 	}
 }
