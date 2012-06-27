@@ -13,6 +13,8 @@ import ch.usi.dag.disl.annotation.GuardMethod;
 import ch.usi.dag.disl.staticcontext.MethodStaticContext;
 
 public class InstrumentationAgent implements Runnable {
+	public static final boolean DEBUG = false;
+
 	private static InstrumentationAgent instance;
 
 	private Instrumentation instrumentation;
@@ -25,7 +27,6 @@ public class InstrumentationAgent implements Runnable {
 	private static Set<ClassLoader> knownClassLoaders = Collections
 			.newSetFromMap(new WeakHashMap<ClassLoader, Boolean>());
 
-	
 	public static void premain(String agentArguments,
 			Instrumentation instrumentation) {
 		instance = new InstrumentationAgent(instrumentation);
@@ -40,15 +41,20 @@ public class InstrumentationAgent implements Runnable {
 
 		boolean newLoader = knownClassLoaders.add(loader);
 		if (newLoader) {
-			System.err.printf("Registered class loader %s (parent = %s).\n",
-					loader, loader.getParent());
+			if (DEBUG) {
+				System.err.printf(
+						"Registered class loader %s (parent = %s).\n", loader,
+						loader.getParent());
+			}
 		}
 	}
 
 	public static void instrumentMethod(String className, String methodName) {
-		System.err.printf(
-				"InstrumentationAgent.instrumentMethod('%s', '%s')\n",
-				className, methodName);
+		if (DEBUG) {
+			System.err.printf(
+					"InstrumentationAgent.instrumentMethod('%s', '%s')\n",
+					className, methodName);
+		}
 
 		String fullName = className + "#" + methodName;
 		synchronized (instrumentedMethods) {
@@ -133,8 +139,10 @@ public class InstrumentationAgent implements Runnable {
 				continue;
 			}
 			try {
-				System.err.printf("About to retransform %s.\n",
-						classToTransform.toString());
+				if (DEBUG) {
+					System.err.printf("About to retransform %s.\n",
+							classToTransform.toString());
+				}
 				transformer.enableTransformation();
 				instrumentation.retransformClasses(classToTransform);
 			} catch (UnmodifiableClassException e) {
