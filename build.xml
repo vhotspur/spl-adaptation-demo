@@ -10,6 +10,7 @@
 		<pathelement location="${classes.dir}" />
 		<path location="${lib.dir}/org.apache.felix.ipojo-1.8.0.jar" />
 		<path location="${lib.dir}/org.apache.felix.ipojo.annotations-1.8.0.jar" />
+		<path location="${lib.dir}/dislserver-unspec.jar" />
 	</path>
 	
 	<taskdef resource="aQute/bnd/ant/taskdef.properties"
@@ -20,7 +21,7 @@
 	        classpath="${lib.dir}/org.apache.felix.ipojo.ant-1.8.0.jar" />
 	
 	<target name="all"
-		depends="clean,package.interfaces,package.store,package.client,package.database,package.env">
+		depends="clean,package.interfaces,package.store,package.client,package.database,package.env,package.agent">
 		<!--
 		Need to clean first, IPOJO bytecode manipulation breaks
 		when applied twice.
@@ -37,7 +38,7 @@
 			destdir="${class.dir}"
 			classpathref="classpath"
 			includeantruntime="false"
-			srcdir="services/:store/:client/:database/"
+			srcdir="services/:store/:client/:database/:agent/"
 		>
 			<compilerarg value="-Xlint:all"/>
 		</javac>
@@ -113,6 +114,17 @@
 			metadata="env/metadata.xml"
 		/>
 	</target>
+
+	<target name="package.agent" depends="compile">
+		<jar destfile="${output.dir}/monitoring-agent.jar" basedir="${class.dir}" includes="cz/cuni/mff/d3s/adapt/bookstore/agent/**">
+			<manifest>
+				<attribute name="Premain-Class" value="cz.cuni.mff.d3s.adapt.bookstore.agent.InstrumentationAgent" />
+				<attribute name="Can-Retransform-Classes" value="true" />
+				<attribute name="Can-Redefine-Classes" value="true" />
+				<attribute name="Class-Path" value="../${lib.dir}/dislserver-unspec.jar ../${lib.dir}/asm-debug-all-4.0.jar" />
+			</manifest>
+		</jar>
+	</target>
 	
 	<target name="run" depends="all,_run">
 	</target>
@@ -125,6 +137,7 @@
 		>
 			<jvmarg value="-XX:-UseSplitVerifier" />
 			<jvmarg value="-ea" />
+			<jvmarg value="-javaagent:../${output.dir}/monitoring-agent.jar" />
 			<arg value="${felix.cache.dir}" />
 		</java>
 	</target>
