@@ -24,7 +24,7 @@
 		classname="org.apache.felix.ipojo.task.IPojoTask"
 	        classpath="${lib.dir}/org.apache.felix.ipojo.ant-1.8.0.jar" />
 	
-	<target name="all" depends="clean,package.interfaces,package.store,package.client,package.database,package.env,package.agent,package.monitor">
+	<target name="all" depends="clean,package.interfaces,package.store,package.client,package.database,package.env,package.agent,package.monitor,package.storage">
 		<!--
 		Need to clean first, IPOJO bytecode manipulation breaks
 		when applied twice.
@@ -123,6 +123,13 @@
 		</jar>
 	</target>
 	
+	<target name="package.storage" depends="compile">
+		<jar destfile="${output.dir}/storage.jar" basedir="${class.dir}" includes="cz/cuni/mff/d3s/adapt/bookstore/agent/data/**">
+			<manifest>
+			</manifest>
+		</jar>
+	</target>
+	
 	<target name="run" depends="all,_run">
 	</target>
 	
@@ -135,6 +142,8 @@
 			<jvmarg value="-XX:-UseSplitVerifier" />
 			<jvmarg value="-ea" />
 			<jvmarg value="-javaagent:../${output.dir}/monitoring-agent.jar" />
+			<jvmarg value="-Xbootclasspath/a:../${output.dir}/storage.jar" />
+			<jvmarg value="-Dorg.osgi.framework.bootdelegation=cz.cuni.mff.d3s.adapt.bookstore.agent.data" />
 			<arg value="${felix.cache.dir}" />
 		</java>
 	</target>
