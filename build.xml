@@ -14,7 +14,7 @@
 	</path>
 	
 	<property name="src.dir.all"
-		value="services/:store/:client/:database/:agent/"
+		value="services/:store/:client/:database/:agent/:monitor/"
 	/>
 	
 	<taskdef resource="aQute/bnd/ant/taskdef.properties"
@@ -24,7 +24,7 @@
 		classname="org.apache.felix.ipojo.task.IPojoTask"
 	        classpath="${lib.dir}/org.apache.felix.ipojo.ant-1.8.0.jar" />
 	
-	<target name="all" depends="clean,package.interfaces,package.store,package.client,package.database,package.env,package.agent">
+	<target name="all" depends="clean,package.interfaces,package.store,package.client,package.database,package.env,package.agent,package.monitor">
 		<!--
 		Need to clean first, IPOJO bytecode manipulation breaks
 		when applied twice.
@@ -83,6 +83,12 @@
 	<target name="package.client">
 		<antcall target="__package">
 			<param name="__package.name" value="client" />
+		</antcall>
+	</target>
+	
+	<target name="package.monitor">
+		<antcall target="__package">
+			<param name="__package.name" value="monitor" />
 		</antcall>
 	</target>
 

@@ -4,6 +4,10 @@
 		name="STORE"
 	/>
 	<instance
+		component="cz.cuni.mff.d3s.adapt.bookstore.monitor.Monitor"
+		name="MONITOR"
+	/>
+	<instance
 		component="cz.cuni.mff.d3s.adapt.bookstore.client.SimpleClient"
 		name="CLIENT"
 	/>

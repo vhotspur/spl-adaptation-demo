@@ -1,0 +1,4 @@
+Export-Package: cz.cuni.mff.d3s.adapt.bookstore.monitor.*
+Import-Package: cz.cuni.mff.d3s.adapt.bookstore.services.*
+Private-Package: cz.cuni.mff.d3s.adapt.bookstore.agent.util.*
+Bundle-Version: 0.0.1
