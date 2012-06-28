@@ -1,7 +1,5 @@
 package cz.cuni.mff.d3s.adapt.bookstore.monitor;
 
-import java.util.Collection;
-
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Validate;
@@ -10,6 +8,10 @@ import cz.cuni.mff.d3s.adapt.bookstore.agent.data.Measurement;
 import cz.cuni.mff.d3s.adapt.bookstore.agent.data.MeasurementStorage;
 import cz.cuni.mff.d3s.adapt.bookstore.agent.util.AccessAgent;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Replicable;
+import cz.cuni.mff.d3s.spl.adapt.DataSource;
+import cz.cuni.mff.d3s.spl.adapt.SlaFormula;
+import cz.cuni.mff.d3s.spl.adapt.SlaFormula.ContractCompliance;
+import cz.cuni.mff.d3s.spl.adapt.SlidingTimeSlotDataSource;
 
 @Component
 public class Monitor implements Runnable {
@@ -18,7 +20,7 @@ public class Monitor implements Runnable {
 	private final String BOOK_STORE_INSTRUMENTED_METHOD = "fulltextSearch";
 	private final String PROBE_NAME = "class:" + BOOK_STORE_CLASS.replace('.', '/') + "#" + BOOK_STORE_INSTRUMENTED_METHOD;
 	
-	private final double SLA_MAX_RESPONSE_TIME = 4000.;
+	private final double SLA_MAX_RESPONSE_TIME_MICROSEC = 4000.;
 	
 	@Requires
 	private Replicable replicable;
@@ -53,44 +55,21 @@ public class Monitor implements Runnable {
 		 * And now, act upon the data.
 		 */
 		while (true) {
-			long now = System.currentTimeMillis();
-			long interval = 1000 * 5;
-			Collection<Long> recentData = measurement.get(PROBE_NAME, now - interval, now);
+			DataSource recentData = SlidingTimeSlotDataSource.createSlotSeconds(PROBE_NAME, measurement, 0, 2);
 			
-			double recentMean = computeMeanUs(recentData);
+			SlaFormula sla = new SlaFormula(SLA_MAX_RESPONSE_TIME_MICROSEC * 1000);
+			sla.bindDataSource(recentData);
 			
-			System.err.printf("          now=%d (recent=%1.0fus [%d samples])\n",
-					now,
-					recentMean, recentData.size());
-			
-			if (recentMean * 1.05 > SLA_MAX_RESPONSE_TIME) {
-				System.err.printf("WARNING: SLA probably violated (starting new instance)!\n");
+			ContractCompliance slaCompliance = sla.checkContract();
+			if (slaCompliance == ContractCompliance.VIOLATES) {
+				System.err.printf("SLA probably violated!\n");
 				replicable.startInstance();
 			}
 			
-			if (recentMean * 1.8 < SLA_MAX_RESPONSE_TIME) {
-				System.err.print("Probably too many resources, stopping some.\n");
-				replicable.stopInstance();
-			}
-			
-			sleep(5);
+			sleep(1);
 		}
-		
 	}
 	
-	private double computeMeanUs(Collection<Long> input) {
-		int size = input.size();
-		if (size == 0) {
-			return Double.NaN;
-		}
-		
-		double sum = 0;
-		for (Long l : input) {
-			sum += l / 1000;
-		}
-		return sum / size;
-	}
-
 	private void sleep(int sec) {
 		try {
 			Thread.sleep(sec * 1000);
