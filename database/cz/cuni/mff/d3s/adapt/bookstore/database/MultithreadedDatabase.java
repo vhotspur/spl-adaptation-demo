@@ -88,6 +88,10 @@ public class MultithreadedDatabase implements Database {
 					found.add(b);
 				}
 			}
+			try {
+				Thread.sleep(2 + random.nextInt(2), random.nextInt(10000));
+			} catch (InterruptedException e) {
+			}
 			synchronized (finished) {
 				finished.set(true);
 				finished.notify();
