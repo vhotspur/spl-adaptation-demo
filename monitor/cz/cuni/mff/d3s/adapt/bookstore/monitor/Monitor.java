@@ -50,14 +50,8 @@ public class Monitor implements Runnable {
 		AccessAgent.instrumentMethod(BOOK_STORE_CLASS,
 				BOOK_STORE_INSTRUMENTED_METHOD);
 		
-		/* Give it some time to run smoothly... */
-		sleep(2);
-		/* ...and instrument the same again. That should fail. */
-		AccessAgent.instrumentMethod(BOOK_STORE_CLASS,
-				BOOK_STORE_INSTRUMENTED_METHOD);
-		
 		/*
-		 * And now, act upon the data.
+		 * And now, act upon the measured data.
 		 */
 		Strategy strategy = getStrategy();
 		strategy.init(measurement, PROBE_NAME, SLA_MAX_RESPONSE_TIME_MICROSEC, replicable);
