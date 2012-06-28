@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.adapt.bookstore.client;
 
 import java.util.Random;
 
+import cz.cuni.mff.d3s.adapt.bookstore.agent.data.EventLogger;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Book;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Store;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Wallet;
@@ -13,6 +14,9 @@ public abstract class RandomClient {
 		Random random = new Random(0);
 		Book[] lastSearchResults = new Book[0];
 		Wallet wallet = new MillionareWallet();
+		
+		EventLogger.recordClientEnter();
+		
 		while (continueShopping()) {
 			long start = System.nanoTime();
 			int action = random.nextInt(10000);
@@ -27,10 +31,11 @@ public abstract class RandomClient {
 			long end = System.nanoTime();
 			long diffMicro = (end - start) / 1000;
 			if (diffMicro > SLA_REQUEST_COMPLETED_MICROSEC) {
-				System.err.printf("Waited too long (%dus, %dus overdue)!\n",
-						diffMicro, diffMicro - SLA_REQUEST_COMPLETED_MICROSEC);
+				EventLogger.recordViolation(diffMicro);
 			}
 		}
+		
+		EventLogger.recordClientLeave();
 	}
 	
 	abstract protected boolean continueShopping();

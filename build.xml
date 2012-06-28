@@ -144,6 +144,7 @@
 			<jvmarg value="-javaagent:../${output.dir}/monitoring-agent.jar" />
 			<jvmarg value="-Xbootclasspath/a:../${output.dir}/storage.jar" />
 			<jvmarg value="-Dorg.osgi.framework.bootdelegation=cz.cuni.mff.d3s.adapt.bookstore.agent.data" />
+			<jvmarg value="-Devents.file=../events.txt" />
 			<arg value="${felix.cache.dir}" />
 		</java>
 	</target>
