@@ -20,7 +20,7 @@
 		name="CLIENT_THREE"
 	/>
 	<instance
-		component="cz.cuni.mff.d3s.adapt.bookstore.database.FileBasedDatabase"
+		component="cz.cuni.mff.d3s.adapt.bookstore.database.MultithreadedDatabase"
 		name="DATABASE"
 	/>
 </ipojo>

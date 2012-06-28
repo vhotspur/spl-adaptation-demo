@@ -8,6 +8,8 @@ import java.io.IOException;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Book;
 
 public class FileBook implements Book {
+	public static final Book[] EMPTY_ARRAY = new FileBook[0];
+	
 	private String title;
 	private String isbn;
 	private int price;
