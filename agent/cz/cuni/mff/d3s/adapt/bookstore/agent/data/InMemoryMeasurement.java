@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.adapt.bookstore.agent.data;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,13 +59,13 @@ public class InMemoryMeasurement implements Measurement {
 	@Override
 	public synchronized Collection<Long> get(String probe) {
 		ProbeData pd = getProbeData(probe);
-		return Collections.unmodifiableCollection(pd.getNonClockData());
+		return new ArrayList<>(pd.getNonClockData());
 	}
 
 	@Override
 	public synchronized Collection<Long> get(String probe, long startTime, long endTime) {
 		ProbeData pd = getProbeData(probe);
-		return Collections.unmodifiableCollection(pd.getClockData(startTime, endTime));
+		return new ArrayList<>(pd.getClockData(startTime, endTime));
 	}
 	
 	protected synchronized ProbeData getProbeData(String id) {
