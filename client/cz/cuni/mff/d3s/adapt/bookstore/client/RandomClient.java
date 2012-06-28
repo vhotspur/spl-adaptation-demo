@@ -7,12 +7,14 @@ import cz.cuni.mff.d3s.adapt.bookstore.services.Store;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Wallet;
 
 public abstract class RandomClient {
+	private final int SLA_REQUEST_COMPLETED_MICROSEC = 10000;
 
 	protected final void randomStoreUse(Store store) {
 		Random random = new Random(0);
 		Book[] lastSearchResults = new Book[0];
 		Wallet wallet = new MillionareWallet();
 		while (continueShopping()) {
+			long start = System.nanoTime();
 			int action = random.nextInt(10000);
 			if (action == 0) {
 				if (lastSearchResults.length > 0) {
@@ -21,6 +23,12 @@ public abstract class RandomClient {
 				}
 			} else {
 				lastSearchResults = store.fulltextSearch(getSearchTerm());
+			}
+			long end = System.nanoTime();
+			long diffMicro = (end - start) / 1000;
+			if (diffMicro > SLA_REQUEST_COMPLETED_MICROSEC) {
+				System.err.printf("Waited too long (%dus, %dus overdue)!\n",
+						diffMicro, diffMicro - SLA_REQUEST_COMPLETED_MICROSEC);
 			}
 		}
 	}
