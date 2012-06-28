@@ -65,8 +65,8 @@ public class MultithreadedDatabase implements Database, Replicable {
 		if (newSize > MAX_POOL_SIZE) {
 			newSize = MAX_POOL_SIZE;
 		}
-		threadPool.setCorePoolSize(newSize);
 		threadPool.setMaximumPoolSize(newSize);
+		threadPool.setCorePoolSize(newSize);
 	}
 	
 	private void addBook(String title, String filename) {
