@@ -14,7 +14,7 @@
 	</path>
 	
 	<property name="src.dir.all"
-		value="services/:store/:client/:database/:agent/:monitor/"
+		value="services/:store/:client/:database/:agent/:monitor/:spl/"
 	/>
 	
 	<taskdef resource="aQute/bnd/ant/taskdef.properties"
