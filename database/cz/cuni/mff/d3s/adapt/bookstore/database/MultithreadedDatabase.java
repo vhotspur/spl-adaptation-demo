@@ -16,10 +16,13 @@ import org.apache.felix.ipojo.annotations.Provides;
 
 import cz.cuni.mff.d3s.adapt.bookstore.services.Book;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Database;
+import cz.cuni.mff.d3s.adapt.bookstore.services.Replicable;
 
 @Component
 @Provides
-public class MultithreadedDatabase implements Database {
+public class MultithreadedDatabase implements Database, Replicable {
+	
+	private final int MAX_POOL_SIZE = 8;
 	
 	private Random random = new Random(0);
 	private Set<FileBook> books = new HashSet<>();
@@ -41,6 +44,29 @@ public class MultithreadedDatabase implements Database {
 		Searcher searcher = new Searcher(term);
 		threadPool.execute(searcher);
 		return searcher.getFoundBooks();
+	}
+	
+
+	@Override
+	public void startInstance() {
+		addToPoolSize(1);
+	}
+
+	@Override
+	public void stopInstance() {
+		addToPoolSize(-1);
+	}
+	
+	private synchronized void addToPoolSize(int amount) {
+		int newSize = threadPool.getCorePoolSize() + amount;
+		if (newSize < 1) {
+			newSize = 1;
+		}
+		if (newSize > MAX_POOL_SIZE) {
+			newSize = MAX_POOL_SIZE;
+		}
+		threadPool.setCorePoolSize(newSize);
+		threadPool.setMaximumPoolSize(newSize);
 	}
 	
 	private void addBook(String title, String filename) {
