@@ -6,15 +6,15 @@ import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Validate;
 
-import cz.cuni.mff.d3s.adapt.bookstore.services.Book;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Store;
-import cz.cuni.mff.d3s.adapt.bookstore.services.Wallet;
 
 @Component
-public class SimpleClient implements Runnable {
+public class SimpleClient extends RandomClient implements Runnable {
 
 	@Requires
 	private Store store;
+	
+	private Random random = new Random(0);
 	
 	public SimpleClient() {
 		
@@ -23,39 +23,17 @@ public class SimpleClient implements Runnable {
 	@Override
 	public void run() {
 		System.err.printf("SimpleClient.run()\n");
-		Random random = new Random(0);
-		Book[] lastSearchResults = new Book[0];
-		Wallet wallet = new MillionareWallet();
-		while (true) {
-			int action = random.nextInt(100);
-			if (action == 0) {
-				if (lastSearchResults.length > 0) {
-					int index = random.nextInt(lastSearchResults.length);
-					store.buy(lastSearchResults[index], wallet);
-				}
-			} else {
-				String randomString = generateRandomString(3, "abcdefghijklmnopqrstuvwxyz", random.nextInt());
-				lastSearchResults = store.fulltextSearch(randomString);
-			}
-		}
+		randomStoreUse(store);
+	}	
+
+	@Override
+	protected boolean continueShopping() {
+		return true;
 	}
 	
-	private String generateRandomString(int length, String allowedCharacters, int seed) {
-		Random rnd = new Random(seed);
-		StringBuilder result = new StringBuilder();
-		for (int i = 0; i < length; i++) {
-			int randomIndex = rnd.nextInt(allowedCharacters.length());
-			char nextCharacter = allowedCharacters.charAt(randomIndex);
-			result.append(nextCharacter);
-		}
-		return result.toString();
-	}
-	
-	private class MillionareWallet implements Wallet {
-		@Override
-		public boolean pay(int amount) {
-			return true;
-		}
+	@Override
+	protected String getSearchTerm() {
+		return generateRandomString(4, "abcdefghijklmnopqrstuvwxyz", random.nextInt());
 	}
 	
 	@Validate
@@ -63,4 +41,8 @@ public class SimpleClient implements Runnable {
 		Thread thread = new Thread(this);
 		thread.start();
 	}
+
+	
+	
+
 }
