@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.adapt.bookstore.client;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Requires;
@@ -14,16 +15,26 @@ public class DelayedClient extends RandomClient implements Runnable {
 	@Requires
 	private Store store;
 	
-	private Random random = new Random(0);
+	private Random random;
+	
+	private static AtomicInteger counter = new AtomicInteger(0);
 	
 	public DelayedClient() {
+		random = new Random(getRandomSeed());
 		
+		/* Exercise the random generator a bit. */
+		int rnd = random.nextInt(1000);
+		while (rnd > 0) {
+			random.nextInt();
+			rnd--;
+		}
 	}
 
 	@Override
 	public void run() {
-		System.err.printf("DelayedClient.run()\n");
-		sleep(20);
+		int delay = 15 + random.nextInt(240);
+		System.err.printf("DelayedClient.run(delay=%d)\n", delay);
+		sleep(delay);
 		System.err.printf("Another customer enters the shop...\n");
 		randomStoreUse(store);
 	}	
@@ -44,5 +55,9 @@ public class DelayedClient extends RandomClient implements Runnable {
 		thread.start();
 	}
 	
+	private int getRandomSeed() {
+		long randomFromTime = System.currentTimeMillis() % 997;
+		return counter.addAndGet((int) randomFromTime);
+	}
 
 }
