@@ -12,6 +12,14 @@
 		name="CLIENT"
 	/>
 	<instance
+		component="cz.cuni.mff.d3s.adapt.bookstore.client.DelayedClient"
+		name="CLIENT_TWO"
+	/>
+	<instance
+		component="cz.cuni.mff.d3s.adapt.bookstore.client.DelayedClient"
+		name="CLIENT_THREE"
+	/>
+	<instance
 		component="cz.cuni.mff.d3s.adapt.bookstore.database.FileBasedDatabase"
 		name="DATABASE"
 	/>
