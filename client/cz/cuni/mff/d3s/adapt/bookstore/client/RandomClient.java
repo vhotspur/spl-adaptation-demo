@@ -15,35 +15,52 @@ public abstract class RandomClient {
 		Book[] lastSearchResults = new Book[0];
 		Wallet wallet = new MillionareWallet();
 		
-		EventLogger.recordClientEnter();
+		while (true) {
+			System.err.printf("Client %s enters the shop.\n", getClientName());
+			
+			EventLogger.recordClientEnter();
 		
-		while (continueShopping()) {
-			long start = System.nanoTime();
-			int action = random.nextInt(10000);
-			if (action == 0) {
-				if (lastSearchResults.length > 0) {
-					int index = random.nextInt(lastSearchResults.length);
-					store.buy(lastSearchResults[index], wallet);
+			while (continueShopping()) {
+				long start = System.nanoTime();
+				int action = random.nextInt(10000);
+				if (action == 0) {
+					if (lastSearchResults.length > 0) {
+						int index = random.nextInt(lastSearchResults.length);
+						store.buy(lastSearchResults[index], wallet);
+					}
+				} else {
+					lastSearchResults = store.fulltextSearch(getSearchTerm());
 				}
-			} else {
-				lastSearchResults = store.fulltextSearch(getSearchTerm());
+				long end = System.nanoTime();
+				long diffMicro = (end - start) / 1000;
+				if (diffMicro > SLA_REQUEST_COMPLETED_MICROSEC) {
+					EventLogger.recordViolation(diffMicro);
+				}
+				
+				beforeNextAction();
 			}
-			long end = System.nanoTime();
-			long diffMicro = (end - start) / 1000;
-			if (diffMicro > SLA_REQUEST_COMPLETED_MICROSEC) {
-				EventLogger.recordViolation(diffMicro);
-			}
-		}
 		
-		EventLogger.recordClientLeave();
+			EventLogger.recordClientLeave();
+			
+			System.err.printf("Client %s leaves the shop.\n", getClientName());
+			
+			beforeNextVisit();
+		}
 	}
 	
 	abstract protected boolean continueShopping();
+	abstract protected void beforeNextVisit();
+	abstract protected void beforeNextAction();
 	abstract protected String getSearchTerm();
+	abstract protected String getClientName();
 	
-	protected void sleep(int sec) {
+	protected void sleepSec(int sec) {
+		sleep(sec * 1000);
+	}
+	
+	protected void sleep(int millis) {
 		try {
-			Thread.sleep(sec * 1000);
+			Thread.sleep(millis);
 		} catch (InterruptedException e) {
 			/* Never mind, this is not critical. */
 		}

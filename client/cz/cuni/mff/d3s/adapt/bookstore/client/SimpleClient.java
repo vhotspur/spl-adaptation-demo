@@ -24,11 +24,26 @@ public class SimpleClient extends RandomClient implements Runnable {
 	public void run() {
 		System.err.printf("SimpleClient.run()\n");
 		randomStoreUse(store);
-	}	
+	}
+	
+	@Override
+	public String getClientName() {
+		return "Simple";
+	}
 
 	@Override
 	protected boolean continueShopping() {
 		return true;
+	}
+	
+	@Override
+	protected void beforeNextVisit() {
+		sleepSec(1);
+	}
+
+	@Override
+	protected void beforeNextAction() {
+		sleep(random.nextInt(1000));
 	}
 	
 	@Override
@@ -42,7 +57,7 @@ public class SimpleClient extends RandomClient implements Runnable {
 		thread.start();
 	}
 
-	
+
 	
 
 }
