@@ -57,6 +57,11 @@ public class DelayedClient extends RandomClient implements Runnable {
 	}
 	
 	@Override
+	protected boolean shallVisitAgain() {
+		return true;
+	}
+	
+	@Override
 	protected void beforeNextVisit() {
 		sleepSec(random.nextInt(30));
 		remainingActionsBeforeLogout = random.nextInt(500);

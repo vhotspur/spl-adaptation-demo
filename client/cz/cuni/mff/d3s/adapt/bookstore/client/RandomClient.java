@@ -15,7 +15,7 @@ public abstract class RandomClient {
 		Book[] lastSearchResults = new Book[0];
 		Wallet wallet = new MillionareWallet();
 		
-		while (true) {
+		while (shallVisitAgain()) {
 			System.err.printf("Client %s enters the shop.\n", getClientName());
 			
 			EventLogger.recordClientEnter();
@@ -49,6 +49,7 @@ public abstract class RandomClient {
 	}
 	
 	abstract protected boolean continueShopping();
+	abstract protected boolean shallVisitAgain();
 	abstract protected void beforeNextVisit();
 	abstract protected void beforeNextAction();
 	abstract protected String getSearchTerm();

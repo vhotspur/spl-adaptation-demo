@@ -30,6 +30,11 @@ public class SimpleClient extends RandomClient implements Runnable {
 	public String getClientName() {
 		return "Simple";
 	}
+	
+	@Override
+	protected boolean shallVisitAgain() {
+		return true;
+	}
 
 	@Override
 	protected boolean continueShopping() {
