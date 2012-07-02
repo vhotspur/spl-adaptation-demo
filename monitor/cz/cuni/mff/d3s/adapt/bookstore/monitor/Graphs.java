@@ -1,9 +1,12 @@
 package cz.cuni.mff.d3s.adapt.bookstore.monitor;
 
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import cz.cuni.mff.d3s.adapt.bookstore.agent.data.EventLogger;
 import cz.cuni.mff.d3s.adapt.bookstore.agent.data.LoggedEventListener;
@@ -24,11 +27,17 @@ public class Graphs {
 		private DataTable data = new DataTable(Long.class, Long.class);
 		private long lastTime = 0;
 		private long valueAtLastTime = 0;
+		private long startValue = 0;
+		
+		public CountedData(long start) {
+			startValue = start;
+			valueAtLastTime = startValue;
+		}
 		
 		public synchronized void addConst(long time, int theConst) {
 			if (time != lastTime) {
 				storeLastTime();
-				valueAtLastTime = 0;
+				valueAtLastTime = startValue;
 			}
 			lastTime = time;
 			valueAtLastTime += theConst;
@@ -39,6 +48,10 @@ public class Graphs {
 		}
 		
 		private void storeLastTime() {
+			if ((valueAtLastTime == startValue) && (lastTime == 0)) {
+				return;
+			}
+			
 			data.add(lastTime, valueAtLastTime);
 		}
 	}
@@ -56,31 +69,64 @@ public class Graphs {
 		public void action(long timeMillis) {
 			data.addConst(timeMillis / 1000, constant);
 		}
+	}
+	
+	private static class UpdateAllDataListener implements LoggedEventListener {
+		private Set<CountedData> allData = new HashSet<>();
+		
+		public UpdateAllDataListener(Set<CountedData> all) {
+			allData = all;
+		}
+		
+		@Override
+		public void action(long timeMillis) {
+			for (CountedData data : allData) {
+				data.addConst(timeMillis / 1000, 0);
+			}
+		}
 		
 	}
 	
 	private CountedData violations;
+	private CountedData clients;
 
 	public Graphs() {
-		violations = new CountedData();
+		violations = new CountedData(0);
+		clients = new CountedData(4);
+		
 		EventLogger.addListener("violation", new UniversalListener(violations, 1));
+		EventLogger.addListener("enter", new UniversalListener(clients, 1));
+		EventLogger.addListener("leave", new UniversalListener(clients, -1));
+		
+		Set<CountedData> all = new HashSet<>();
+		all.add(violations);
+		all.add(clients);
+		UpdateAllDataListener prettyGraphs = new UpdateAllDataListener(all);
+		String events[] = {"violation", "enter", "leave"};
+		for (String event : events) {
+			EventLogger.addListener(event, prettyGraphs);
+		}
 	}
 	
 	public InputStream generate(String id) {
 		if (id.equals("violations")) {
 			return generatePlot(violations.getData());
+		} else if (id.equals("all")) {
+			DataTable violationsData = violations.getData();
+			DataTable clientsData = clients.getData();
+			
+			XYPlot plot = new XYPlot(violationsData, clientsData);
+			
+			setLinesOnly(plot, violationsData, Color.RED);
+			setLinesOnly(plot, clientsData, Color.BLUE);
+			
+			return plotToPngStream(plot);
 		}
 		
 		return null;
 	}
 	
-	public InputStream generatePlot(DataTable data) {
-		XYPlot plot = new XYPlot(data);
-		
-		LineRenderer lines = new DefaultLineRenderer2D();
-		plot.setLineRenderer(data, lines);
-		plot.setPointRenderer(data, null);
-		
+	private InputStream plotToPngStream(XYPlot plot) {
 		plot.getAxisRenderer(XYPlot.AXIS_Y).setSetting(AxisRenderer.TICKS_SPACING, 20.0);
 		
 		plot.setInsets(new Insets2D.Double(20, 60, 60, 40));
@@ -98,5 +144,20 @@ public class Graphs {
 		ByteArrayInputStream result = new ByteArrayInputStream(out.toByteArray());
 		
 		return result;
+	}
+	
+	public InputStream generatePlot(DataTable data) {
+		XYPlot plot = new XYPlot(data);
+		setLinesOnly(plot, data, Color.BLACK);
+		return plotToPngStream(plot);
+	}
+	
+	private void setLinesOnly(XYPlot plot, DataTable data, Color color) {
+		LineRenderer lines = new DefaultLineRenderer2D();
+		lines.setSetting(DefaultLineRenderer2D.COLOR, color);
+		
+		plot.setLineRenderer(data, lines);
+		
+		plot.setPointRenderer(data, null);
 	}
 }
