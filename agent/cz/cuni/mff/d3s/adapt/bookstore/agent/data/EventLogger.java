@@ -3,11 +3,25 @@ package cz.cuni.mff.d3s.adapt.bookstore.agent.data;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class EventLogger {
 	private static final Boolean guard = new Boolean(true);
 	private static Writer writer = null;
 	private static long startTimeMillis = 0;
+	private static Map<String, Collection<LoggedEventListener>> listeners = new HashMap<>();
+	
+	public static void addListener(String action, LoggedEventListener listener) {
+		Collection<LoggedEventListener> existing = listeners.get(action);
+		if (existing == null) {
+			existing = new LinkedList<>();
+			listeners.put(action, existing);
+		}
+		existing.add(listener);
+	}
 	
 	public static void recordViolation(long howMuchMicro) {
 		recordEvent("violation");
@@ -42,6 +56,13 @@ public class EventLogger {
 				writer.flush();
 			} catch (IOException e) {
 				System.err.printf("Failed to write: %s\n", e.getMessage());
+			}
+		}
+		
+		Collection<LoggedEventListener> whoToNotify = listeners.get(entry);
+		if (whoToNotify != null) {
+			for (LoggedEventListener listener : whoToNotify) {
+				listener.action(offset);
 			}
 		}
 	}
