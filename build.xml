@@ -11,6 +11,7 @@
 		<path location="${lib.dir}/org.apache.felix.ipojo-1.8.0.jar" />
 		<path location="${lib.dir}/org.apache.felix.ipojo.annotations-1.8.0.jar" />
 		<path location="${lib.dir}/dislserver-unspec.jar" />
+		<path location="${lib.dir}/gral-core-0.9-SNAPSHOT.jar" />
 	</path>
 	
 	<property name="src.dir.all"

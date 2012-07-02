@@ -1,5 +1,7 @@
 package cz.cuni.mff.d3s.adapt.bookstore.monitor;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +13,7 @@ import cz.cuni.mff.d3s.adapt.bookstore.agent.data.Measurement;
 import cz.cuni.mff.d3s.adapt.bookstore.agent.data.MeasurementStorage;
 import cz.cuni.mff.d3s.adapt.bookstore.agent.util.AccessAgent;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.None;
+import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Predict;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Simple;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Strategy;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Replicable;
@@ -22,17 +25,28 @@ public class Monitor implements Runnable {
 	private final String BOOK_STORE_INSTRUMENTED_METHOD = "fulltextSearch";
 	private final String PROBE_NAME = "class:" + BOOK_STORE_CLASS.replace('.', '/') + "#" + BOOK_STORE_INSTRUMENTED_METHOD;
 	
-	private final long SLA_MAX_RESPONSE_TIME_MICROSEC = 4000;
+	private final long SLA_MAX_RESPONSE_TIME_MICROSEC = 8000;
 	
 	@Requires
 	private Replicable replicable;
 	
 	private Map<String, Strategy> strategies;
 	
+	private NanoHTTPD webserver;
+	
+	private Graphs graphs;
+	
 	public Monitor() {
 		strategies = new HashMap<>();
 		strategies.put("none", new None());
 		strategies.put("simple", new Simple());
+		graphs = new Graphs();
+		try {
+			webserver = new NanoHTTPD(8888, new File("../wwwroot/").getAbsoluteFile(), graphs);
+		} catch (IOException e) {
+			System.err.printf("Failed to start web server.\n");
+			e.printStackTrace();
+		}
 	}
 
 	@Override
