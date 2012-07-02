@@ -17,6 +17,7 @@ import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Predict;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Simple;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Strategy;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Replicable;
+import cz.cuni.mff.d3s.adapt.bookstore.services.Store;
 
 @Component
 public class Monitor implements Runnable {
@@ -30,10 +31,13 @@ public class Monitor implements Runnable {
 	@Requires
 	private Replicable replicable;
 	
+	@Requires
+	private Store store;
+	
 	private Map<String, Strategy> strategies;
 	
 	private NanoHTTPD webserver;
-	
+	private Controller controller;
 	private Graphs graphs;
 	
 	public Monitor() {
@@ -41,8 +45,9 @@ public class Monitor implements Runnable {
 		strategies.put("none", new None());
 		strategies.put("simple", new Simple());
 		graphs = new Graphs();
+		controller = new Controller(store);
 		try {
-			webserver = new NanoHTTPD(8888, new File("../wwwroot/").getAbsoluteFile(), graphs);
+			webserver = new NanoHTTPD(8888, new File("../wwwroot/").getAbsoluteFile(), graphs, controller);
 		} catch (IOException e) {
 			System.err.printf("Failed to start web server.\n");
 			e.printStackTrace();

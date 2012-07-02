@@ -72,6 +72,7 @@ import java.io.FileOutputStream;
 public class NanoHTTPD
 {
 	private Graphs graphs;
+	private Controller controller;
 	
 	// ==================================================
 	// API parts
@@ -99,6 +100,18 @@ public class NanoHTTPD
 				return new Response(HTTP_NOTFOUND, "text/plain", "Given graph not found");
 			}
 			return new Response(HTTP_OK, "image/png", image);
+		}
+		
+		if (uri.startsWith("/ACTION/")) {
+			String action = uri.replace("/ACTION/", "");
+			if (action.equals("add-client")) {
+				controller.addClient();
+				return new Response(HTTP_OK, "text/plain", "Client added");
+			}
+			if (action.equals("remove-client")) {
+				controller.stopClient();
+				return new Response(HTTP_OK, "text/plain", "Client removed");
+			}
 		}
 		
 		Enumeration e = header.propertyNames();
@@ -229,10 +242,12 @@ public class NanoHTTPD
 	/**
 	 * Starts a HTTP server to given port.<p>
 	 * Throws an IOException if the socket is already in use
+	 * @param controller 
 	 */
-	public NanoHTTPD( int port, File wwwroot, Graphs gr ) throws IOException
+	public NanoHTTPD( int port, File wwwroot, Graphs gr, Controller ctl) throws IOException
 	{
 		graphs = gr;
+		controller = ctl;
 		myTcpPort = port;
 		this.myRootDir = wwwroot;
 		myServerSocket = new ServerSocket( myTcpPort );

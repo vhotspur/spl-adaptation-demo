@@ -1,5 +1,5 @@
 Export-Package: cz.cuni.mff.d3s.adapt.bookstore.monitor.*
 Import-Package: cz.cuni.mff.d3s.adapt.bookstore.services.*, javax.imageio.*
 Include-Resource: @../lib/gral-core-0.9-SNAPSHOT.jar!/**
-Private-Package: cz.cuni.mff.d3s.adapt.bookstore.agent.util.*, cz.cuni.mff.d3s.spl.adapt.*, cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.*, de.erichseifert.gral.*
+Private-Package: cz.cuni.mff.d3s.adapt.bookstore.agent.util.*, cz.cuni.mff.d3s.adapt.bookstore.client.*, cz.cuni.mff.d3s.spl.adapt.*, cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.*, de.erichseifert.gral.*
 Bundle-Version: 0.0.1

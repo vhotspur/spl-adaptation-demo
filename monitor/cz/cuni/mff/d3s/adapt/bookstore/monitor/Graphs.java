@@ -27,17 +27,19 @@ public class Graphs {
 		private DataTable data = new DataTable(Long.class, Long.class);
 		private long lastTime = 0;
 		private long valueAtLastTime = 0;
-		private long startValue = 0;
+		private Long startValue = null;
 		
-		public CountedData(long start) {
+		public CountedData(Long start) {
 			startValue = start;
-			valueAtLastTime = startValue;
+			valueAtLastTime = 0;
 		}
 		
 		public synchronized void addConst(long time, int theConst) {
 			if (time != lastTime) {
 				storeLastTime();
-				valueAtLastTime = startValue;
+				if (startValue != null) {
+					valueAtLastTime = startValue;
+				}
 			}
 			lastTime = time;
 			valueAtLastTime += theConst;
@@ -48,7 +50,8 @@ public class Graphs {
 		}
 		
 		private void storeLastTime() {
-			if ((valueAtLastTime == startValue) && (lastTime == 0)) {
+			if (((startValue != null) && (valueAtLastTime == startValue.longValue()))
+					&& (lastTime == 0)) {
 				return;
 			}
 			
@@ -91,8 +94,8 @@ public class Graphs {
 	private CountedData clients;
 
 	public Graphs() {
-		violations = new CountedData(0);
-		clients = new CountedData(4);
+		violations = new CountedData(new Long(0));
+		clients = new CountedData(null);
 		
 		EventLogger.addListener("violation", new UniversalListener(violations, 1));
 		EventLogger.addListener("enter", new UniversalListener(clients, 1));

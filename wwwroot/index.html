@@ -17,7 +17,8 @@ setInterval(function() {
 <img id="main-graph" src="/GRAPH/all.png" />
 
 <form>
-	<!-- Action buttons would go here -->
+	<button onclick="jQuery.ajax('/ACTION/add-client'); return false;">Start client</button>
+	<button onclick="jQuery.ajax('/ACTION/remove-client'); return false;">Stop client</button>
 </form>
 
 </body>
