@@ -112,6 +112,10 @@ public class NanoHTTPD
 				controller.stopClient();
 				return new Response(HTTP_OK, "text/plain", "Client removed");
 			}
+			if (action.equals("change-strategy")) {
+				controller.changeStrategy(parms.getProperty("strategy"));
+				return new Response(HTTP_OK, "text/plain", "Strategy changed");
+			}
 		}
 		
 		Enumeration e = header.propertyNames();

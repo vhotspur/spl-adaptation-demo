@@ -34,18 +34,23 @@ public class Monitor implements Runnable {
 	@Requires
 	private Store store;
 	
-	private Map<String, Strategy> strategies;
-	
 	private NanoHTTPD webserver;
 	private Controller controller;
 	private Graphs graphs;
 	
 	public Monitor() {
-		strategies = new HashMap<>();
+		graphs = new Graphs();
+		
+		Map<String, Strategy> strategies = new HashMap<>();
 		strategies.put("none", new None());
 		strategies.put("simple", new Simple());
-		graphs = new Graphs();
-		controller = new Controller(store);
+		
+		Measurement measurement = MeasurementStorage.getBackend();
+		for (Strategy s : strategies.values()) {
+			s.init(measurement, PROBE_NAME, SLA_MAX_RESPONSE_TIME_MICROSEC, replicable);
+		}
+		
+		controller = new Controller(store, strategies);
 		try {
 			webserver = new NanoHTTPD(8888, new File("../wwwroot/").getAbsoluteFile(), graphs, controller);
 		} catch (IOException e) {
@@ -56,7 +61,7 @@ public class Monitor implements Runnable {
 
 	@Override
 	public void run() {
-		Measurement measurement = MeasurementStorage.getBackend();		
+		
 		System.err.printf("MonitoringClient.run(replicable=%s)\n", replicable);
 		
 		/*
@@ -72,12 +77,10 @@ public class Monitor implements Runnable {
 		/*
 		 * And now, act upon the measured data.
 		 */
-		Strategy strategy = getStrategy();
-		strategy.init(measurement, PROBE_NAME, SLA_MAX_RESPONSE_TIME_MICROSEC, replicable);
-		System.err.printf("Acting depending on strategy `%s'.\n", strategy.getName());
 		while (true) {
-			strategy.act();
-			
+			Strategy strategy = controller.getStrategy();
+			System.err.printf("Using strategy `%s'.\n", strategy.getName());
+			strategy.act();	
 			sleep(1);
 		}
 	}
@@ -87,16 +90,6 @@ public class Monitor implements Runnable {
 			Thread.sleep(sec * 1000);
 		} catch (InterruptedException e) {
 			/* Never mind, this is not critical. */
-		}
-	}
-	
-	private Strategy getStrategy() {
-		String strategyName = System.getProperty("strategy", "none");
-		Strategy strategy = strategies.get(strategyName);
-		if (strategy == null) {
-			return new None();
-		} else {
-			return strategy;
 		}
 	}
 	
