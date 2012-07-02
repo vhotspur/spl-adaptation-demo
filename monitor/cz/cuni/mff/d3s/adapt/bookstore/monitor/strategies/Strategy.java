@@ -6,4 +6,5 @@ import cz.cuni.mff.d3s.adapt.bookstore.services.Replicable;
 public interface Strategy {
 	void init(Measurement measurement, String probeName, long slaTimeMicros, Replicable replicable);
 	void act();
+	String getName();
 }

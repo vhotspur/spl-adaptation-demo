@@ -46,4 +46,9 @@ public class Simple implements Strategy {
 		}
 	}
 
+	@Override
+	public String getName() {
+		return "Simple";
+	}
+
 }

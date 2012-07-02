@@ -55,6 +55,7 @@ public class Monitor implements Runnable {
 		 */
 		Strategy strategy = getStrategy();
 		strategy.init(measurement, PROBE_NAME, SLA_MAX_RESPONSE_TIME_MICROSEC, replicable);
+		System.err.printf("Acting depending on strategy `%s'.\n", strategy.getName());
 		while (true) {
 			strategy.act();
 			

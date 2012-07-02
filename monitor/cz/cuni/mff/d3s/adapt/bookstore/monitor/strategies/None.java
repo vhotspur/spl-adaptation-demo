@@ -16,4 +16,9 @@ public class None implements Strategy {
 		/* Do nothing. */
 	}
 
+	@Override
+	public String getName() {
+		return "None";
+	}
+
 }
