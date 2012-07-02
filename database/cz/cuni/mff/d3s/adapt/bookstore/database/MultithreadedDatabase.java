@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Provides;
 
+import cz.cuni.mff.d3s.adapt.bookstore.agent.data.EventLogger;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Book;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Database;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Replicable;
@@ -37,6 +38,7 @@ public class MultithreadedDatabase implements Database, Replicable {
 		
 		tasks = new ArrayBlockingQueue<>(100);
 		threadPool = new ThreadPoolExecutor(1, 1, 100, TimeUnit.SECONDS, tasks);
+		EventLogger.recordInstanceStart();
 	}
 
 	@Override
@@ -58,15 +60,25 @@ public class MultithreadedDatabase implements Database, Replicable {
 	}
 	
 	private synchronized void addToPoolSize(int amount) {
-		int newSize = threadPool.getCorePoolSize() + amount;
+		int oldSize = threadPool.getCorePoolSize();
+		int newSize = oldSize + amount;
 		if (newSize < 1) {
 			newSize = 1;
 		}
 		if (newSize > MAX_POOL_SIZE) {
 			newSize = MAX_POOL_SIZE;
 		}
-		threadPool.setMaximumPoolSize(newSize);
+		
+		for (int i = oldSize; i < newSize; i++) {
+			EventLogger.recordInstanceStart();
+		}
+		
+		for (int i = oldSize; i > newSize; i--) {
+			EventLogger.recordInstanceStop();
+		}
+		
 		threadPool.setCorePoolSize(newSize);
+		threadPool.setMaximumPoolSize(newSize);
 	}
 	
 	private void addBook(String title, String filename) {

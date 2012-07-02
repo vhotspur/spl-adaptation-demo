@@ -21,6 +21,14 @@ public class EventLogger {
 		recordEvent("leave");
 	}
 	
+	public static void recordInstanceStart() {
+		recordEvent("start");
+	}
+	
+	public static void recordInstanceStop() {
+		recordEvent("stop");
+	}
+	
 	private static void recordEvent(String entry) {
 		init();
 		
