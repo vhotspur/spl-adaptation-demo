@@ -108,13 +108,14 @@ public class Graphs {
 		all.add(violations);
 		all.add(clients);
 		UpdateAllDataListener prettyGraphs = new UpdateAllDataListener(all);
-		String events[] = {"violation", "enter", "leave"};
+		String events[] = {"violation", "enter", "leave", "image"};
 		for (String event : events) {
 			EventLogger.addListener(event, prettyGraphs);
 		}
 	}
 	
 	public InputStream generate(String id) {
+		EventLogger.imageRequested();
 		if (id.equals("violations")) {
 			return generatePlot(violations.getData());
 		} else if (id.equals("all")) {

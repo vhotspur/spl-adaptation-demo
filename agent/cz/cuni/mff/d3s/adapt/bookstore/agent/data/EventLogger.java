@@ -43,6 +43,10 @@ public class EventLogger {
 		recordEvent("stop");
 	}
 	
+	public static void imageRequested() {
+		recordEvent("image");
+	}
+	
 	private static void recordEvent(String entry) {
 		init();
 		
