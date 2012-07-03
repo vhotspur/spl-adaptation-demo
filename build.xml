@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <project name="Book Store" default="all" basedir=".">
 
+	<property name="dist.name" value="adapt.demo" />
+	<property name="dist.dir" value="${dist.name}" />
 	<property name="lib.dir" value="lib" />
 	<property name="output.dir" value="output" />
 	<property name="class.dir" value="${output.dir}/classes" />
@@ -35,6 +37,31 @@
 	<target name="clean">
 		<delete dir="${output.dir}" />
 		<delete dir="felix/${felix.cache.dir}" />
+	</target>
+	
+	<target name="dist" depends="clean">
+		<mkdir dir="${output.dir}/${dist.dir}" />
+		<copy todir="${output.dir}/${dist.dir}" >
+			<fileset dir="." includes="services/**" />
+			<fileset dir="." includes="store/**" />
+			<fileset dir="." includes="client/**" />
+			<fileset dir="." includes="database/**" />
+			<fileset dir="." includes="agent/**" />
+			<fileset dir="." includes="monitor/**" />
+			<fileset dir="." includes="spl/**" />
+			<fileset dir="." includes="wwwroot/**" />
+			<fileset dir="." includes="lib/**" />
+			<fileset dir="." includes="env/**" />
+			<fileset dir="." includes="felix/**" />
+			<fileset file="build.xml" />
+		</copy>
+		<tar
+			compression="gzip"
+			destfile="${output.dir}/${dist.name}.tar.gz"
+			basedir="${output.dir}"
+			includes="${dist.dir}/**"
+		>
+		</tar>
 	</target>
 	
 	<target name="compile" depends="prepare">
