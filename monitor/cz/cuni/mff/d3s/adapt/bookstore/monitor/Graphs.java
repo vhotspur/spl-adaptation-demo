@@ -35,6 +35,9 @@ public class Graphs {
 		}
 		
 		public synchronized void addConst(long time, int theConst) {
+			if (time < lastTime) {
+				return;
+			}
 			if (time != lastTime) {
 				storeLastTime();
 				if (startValue != null) {
