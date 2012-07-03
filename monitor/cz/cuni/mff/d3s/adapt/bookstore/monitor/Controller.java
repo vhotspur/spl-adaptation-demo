@@ -93,6 +93,7 @@ public class Controller {
 	}
 
 	public synchronized Strategy getStrategy() {
+		assert currentStrategy != null;
 		return currentStrategy;
 	}
 	
@@ -105,12 +106,12 @@ public class Controller {
 	}
 	
 	private Strategy getDefaultStrategy() {
-		String strategyName = System.getProperty("strategy", "none");
+		String strategyName = System.getProperty("strategy", "");
 		Strategy strategy = strategies.get(strategyName);
 		if (strategy == null) {
-			return new None();
-		} else {
-			return strategy;
+			strategy = strategies.get("none");
 		}
+		assert strategy != null;
+		return strategy;
 	}
 }
