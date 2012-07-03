@@ -23,15 +23,21 @@ import de.erichseifert.gral.util.Insets2D;
 public class Graphs {
 	
 	private static class CountedData {
-		@SuppressWarnings("unchecked")
-		private DataTable data = new DataTable(Long.class, Long.class);
+		private final int WIDTH = 80;
+		
+		private DataTable data;
 		private long lastTime = 0;
 		private long valueAtLastTime = 0;
 		private Long startValue = null;
 		
+		@SuppressWarnings("unchecked")
 		public CountedData(Long start) {
 			startValue = start;
+			data = new DataTable(Long.class, Long.class);
 			valueAtLastTime = 0;
+			for (long i = -WIDTH; i < 0; i++) {
+				data.add(i, (long) 0);
+			}
 		}
 		
 		public synchronized void addConst(long time, int theConst) {
@@ -59,6 +65,7 @@ public class Graphs {
 			}
 			
 			data.add(lastTime, valueAtLastTime);
+			data.remove(0);
 		}
 	}
 	
