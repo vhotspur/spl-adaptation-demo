@@ -27,16 +27,10 @@ public class MultithreadedDatabase implements Database, Replicable {
 	private final int MAX_POOL_SIZE = 8;
 	
 	private Random random = new Random(0);
-	private Set<FileBook> books = new HashSet<>();
 	BlockingQueue<Runnable> tasks; 
 	private ThreadPoolExecutor threadPool;
 	
 	public MultithreadedDatabase() {
-		for (int i = 1; i < 9; i++) {
-			addBook(String.format("Book #%d", i),
-				String.format("book_%d.txt", i));
-		}
-		
 		tasks = new ArrayBlockingQueue<>(100);
 		threadPool = new ThreadPoolExecutor(1, 1, 100, TimeUnit.SECONDS, tasks);
 		EventLogger.recordInstanceStart();
@@ -87,18 +81,7 @@ public class MultithreadedDatabase implements Database, Replicable {
 		threadPool.setMaximumPoolSize(newSize);
 	}
 	
-	private void addBook(String title, String filename) {
-		String isbn = String.format("ISBN-%05d", books.size() + 1);
-		int price = random.nextInt(20) + 5;
-		
-		FileBook book = new FileBook(title, isbn, price,
-			"../books/" + filename);
-		
-		books.add(book);
-	}
-	
 	private class Searcher implements Runnable {
-		private String termLowered;
 		private List<Book> found;
 		/*
 		 * Normal boolean does not have wait() and notify() and
@@ -107,7 +90,6 @@ public class MultithreadedDatabase implements Database, Replicable {
 		private AtomicBoolean finished;
 		
 		public Searcher(String term) {
-			termLowered = term.toLowerCase();
 			found = new ArrayList<>();
 			finished = new AtomicBoolean(false);
 		}
@@ -127,11 +109,6 @@ public class MultithreadedDatabase implements Database, Replicable {
 		
 		@Override
 		public void run() {
-			for (FileBook b : books) {
-				if (b.contentMatches(termLowered)) {
-					found.add(b);
-				}
-			}
 			try {
 				int requestLength = Constants.REQUEST_LENGTH_FIXED_MILLIS
 						+ random.nextInt(Constants.REQUEST_LENGTH_VARIABLE_MILLIS);
