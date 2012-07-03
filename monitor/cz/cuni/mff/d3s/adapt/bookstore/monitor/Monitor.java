@@ -12,8 +12,8 @@ import org.apache.felix.ipojo.annotations.Validate;
 import cz.cuni.mff.d3s.adapt.bookstore.agent.data.Measurement;
 import cz.cuni.mff.d3s.adapt.bookstore.agent.data.MeasurementStorage;
 import cz.cuni.mff.d3s.adapt.bookstore.agent.util.AccessAgent;
+import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Volatiled;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.None;
-import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Predict;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Simple;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Strategy;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Constants;
@@ -43,6 +43,7 @@ public class Monitor implements Runnable {
 		Map<String, Strategy> strategies = new HashMap<>();
 		strategies.put("none", new None());
 		strategies.put("simple", new Simple());
+		strategies.put("volatiled", new Volatiled());
 		
 		Measurement measurement = MeasurementStorage.getBackend();
 		for (Strategy s : strategies.values()) {
@@ -78,7 +79,6 @@ public class Monitor implements Runnable {
 		 */
 		while (true) {
 			Strategy strategy = controller.getStrategy();
-			System.err.printf("Using strategy `%s'.\n", strategy.getName());
 			strategy.act();	
 			sleep(1);
 		}

@@ -45,7 +45,8 @@ $(document).ready(function() {
 	<button onclick="jQuery.ajax('/ACTION/add-client'); return false;">Start client</button>
 	<button onclick="jQuery.ajax('/ACTION/remove-client'); return false;">Stop client</button>
 	<button onclick="jQuery.ajax('/ACTION/change-strategy?strategy=none'); return false;">Turn-off adaptability</button>
-	<button onclick="jQuery.ajax('/ACTION/change-strategy?strategy=simple'); return false;">Engage simple adaptability</button>
+	<button onclick="jQuery.ajax('/ACTION/change-strategy?strategy=simple'); return false;">Engage adaptability (conservative)</button>
+	<button onclick="jQuery.ajax('/ACTION/change-strategy?strategy=volatiled'); return false;">Engage adaptability (volatile)</button>
 </form>
 
 </body>

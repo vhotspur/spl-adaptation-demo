@@ -7,7 +7,7 @@ import cz.cuni.mff.d3s.spl.adapt.SlaFormula;
 import cz.cuni.mff.d3s.spl.adapt.SlaFormula.ContractCompliance;
 import cz.cuni.mff.d3s.spl.adapt.SlidingTimeSlotDataSource;
 
-public class Simple implements Strategy {
+public class Volatiled implements Strategy {
 	
 	private SlaFormula sla = null;
 	private SlaFormula stopInstanceContract = null;
@@ -18,14 +18,14 @@ public class Simple implements Strategy {
 			long slaTimeMicros, Replicable replicable) {
 		target = replicable;
 		
-		DataSource recentData = SlidingTimeSlotDataSource.createSlotSeconds(probeName, measurement, 0, 3);
-		DataSource oldData = SlidingTimeSlotDataSource.createSlotSeconds(probeName, measurement, 0, 10);
+		DataSource currentData = SlidingTimeSlotDataSource.createSlotSeconds(probeName, measurement, 0, 1);
+		DataSource recentData = SlidingTimeSlotDataSource.createSlotSeconds(probeName, measurement, 0, 2);
 		
-		sla = new SlaFormula(slaTimeMicros * 1000);
-		sla.bindDataSource(recentData);
+		sla = new SlaFormula((double)(slaTimeMicros * 1000) * 0.8);
+		sla.bindDataSource(currentData);
 		
-		stopInstanceContract = new SlaFormula(slaTimeMicros * 1000 / 2);
-		stopInstanceContract.bindDataSource(oldData);
+		stopInstanceContract = new SlaFormula((double)(slaTimeMicros * 1000) * 2.0 / 3.0);
+		stopInstanceContract.bindDataSource(recentData);
 	}
 	
 	@Override
@@ -48,7 +48,7 @@ public class Simple implements Strategy {
 
 	@Override
 	public String getName() {
-		return "Simple";
+		return "Hard";
 	}
 
 }
