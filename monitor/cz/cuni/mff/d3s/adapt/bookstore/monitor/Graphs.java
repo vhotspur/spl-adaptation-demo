@@ -114,7 +114,7 @@ public class Graphs {
 		}
 	}
 	
-	public InputStream generate(String id) {
+	public InputStream generate(String id, int width, int height) {
 		EventLogger.imageRequested();
 		if (id.equals("violations")) {
 			return generatePlot(violations.getData());
@@ -126,13 +126,13 @@ public class Graphs {
 			
 			setLinesOnly(plot, violationsData, Color.RED);
 			
-			return plotToPngStream(plot);
+			return plotToPngStream(plot, width, height);
 		}
 		
 		return null;
 	}
 	
-	private InputStream plotToPngStream(XYPlot plot) {
+	private InputStream plotToPngStream(XYPlot plot, int width, int height) {
 		plot.getAxisRenderer(XYPlot.AXIS_Y).setSetting(AxisRenderer.TICKS_SPACING, 20.0);
 		
 		plot.setInsets(new Insets2D.Double(20, 60, 60, 40));
@@ -142,7 +142,7 @@ public class Graphs {
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			writer.write(plot, out, 1024, 768);
+			writer.write(plot, out, width, height);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -155,7 +155,7 @@ public class Graphs {
 	public InputStream generatePlot(DataTable data) {
 		XYPlot plot = new XYPlot(data);
 		setLinesOnly(plot, data, Color.BLACK);
-		return plotToPngStream(plot);
+		return plotToPngStream(plot, 1024, 768);
 	}
 	
 	private void setLinesOnly(XYPlot plot, DataTable data, Color color) {

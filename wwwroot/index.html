@@ -13,7 +13,7 @@ function loadIntoElement(element, url) {
 
 $(document).ready(function() {
 	setInterval(function() {
-		$("#main-graph").attr("src", "/GRAPH/all.png?" + new Date().getTime());
+		$("#main-graph").attr("src", "/GRAPH/all.png?width=800&height=600&" + new Date().getTime());
 	}, 1000);
 	
 	setInterval(function() {

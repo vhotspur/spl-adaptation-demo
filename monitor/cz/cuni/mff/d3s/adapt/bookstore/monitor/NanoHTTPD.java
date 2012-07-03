@@ -95,7 +95,9 @@ public class NanoHTTPD
 		
 		if (uri.startsWith("/GRAPH/")) {
 			String id = uri.replace("/GRAPH/", "").replace(".png", "");
-			InputStream image = graphs.generate(id);
+			InputStream image = graphs.generate(id,
+					sanitizeNumber(parms.getProperty("width"), 800, 200, 2048),
+					sanitizeNumber(parms.getProperty("height"), 600, 200, 2048));
 			if (image == null) {
 				return new Response(HTTP_NOTFOUND, "text/plain", "Given graph not found");
 			}
@@ -153,6 +155,17 @@ public class NanoHTTPD
 		}
 
 		return serveFile( uri, header, myRootDir, true );
+	}
+	
+	private int sanitizeNumber(String valueStr, int defaultValue, int min, int max) {
+		if (valueStr == null) {
+			return defaultValue;
+		}
+		int val = Integer.valueOf(valueStr);
+		if ((val < min) || (val > max)) {
+			return defaultValue;
+		}
+		return val;
 	}
 
 	/**
