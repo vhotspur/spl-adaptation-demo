@@ -16,6 +16,7 @@ import org.apache.felix.ipojo.annotations.Provides;
 
 import cz.cuni.mff.d3s.adapt.bookstore.agent.data.EventLogger;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Book;
+import cz.cuni.mff.d3s.adapt.bookstore.services.Constants;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Database;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Replicable;
 
@@ -132,7 +133,9 @@ public class MultithreadedDatabase implements Database, Replicable {
 				}
 			}
 			try {
-				Thread.sleep(2 + random.nextInt(2), random.nextInt(10000));
+				int requestLength = Constants.REQUEST_LENGTH_FIXED_MILLIS
+						+ random.nextInt(Constants.REQUEST_LENGTH_VARIABLE_MILLIS);
+				Thread.sleep(requestLength);
 			} catch (InterruptedException e) {
 			}
 			synchronized (finished) {

@@ -8,6 +8,7 @@ import java.util.Set;
 import cz.cuni.mff.d3s.adapt.bookstore.client.RandomClient;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.None;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Strategy;
+import cz.cuni.mff.d3s.adapt.bookstore.services.Constants;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Replicable;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Store;
 
@@ -41,6 +42,9 @@ public class Controller {
 
 		@Override
 		protected void beforeNextAction() {
+			int sleepLength = Constants.CLIENT_PAUSE_BETWEEN_ACTIONS_FIXED_MILLIS
+					+ random.nextInt(Constants.CLIENT_PAUSE_BETWEEN_ACTIONS_VARIABLE_MILLIS);
+			sleep(sleepLength);
 		}
 
 		@Override

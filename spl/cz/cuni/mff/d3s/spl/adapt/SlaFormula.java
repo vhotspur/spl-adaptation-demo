@@ -2,6 +2,8 @@ package cz.cuni.mff.d3s.spl.adapt;
 
 import java.util.Collection;
 
+import cz.cuni.mff.d3s.adapt.bookstore.services.Constants;
+
 public class SlaFormula {
 	public static final int MIN_SAMPLE_COUNT = 10;
 	
@@ -30,7 +32,7 @@ public class SlaFormula {
 		
 		double actualMean = getSampleMean(data);
 		
-		if (actualMean * 1.1 > limit) {
+		if (actualMean * Constants.SLA_SAFE_MARGIN > limit) {
 			return ContractCompliance.VIOLATES;
 		}
 		

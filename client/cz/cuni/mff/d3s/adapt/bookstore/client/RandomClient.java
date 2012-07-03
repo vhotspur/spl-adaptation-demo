@@ -4,12 +4,11 @@ import java.util.Random;
 
 import cz.cuni.mff.d3s.adapt.bookstore.agent.data.EventLogger;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Book;
+import cz.cuni.mff.d3s.adapt.bookstore.services.Constants;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Store;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Wallet;
 
 public abstract class RandomClient {
-	private final int SLA_REQUEST_COMPLETED_MICROSEC = 10000;
-
 	protected final void randomStoreUse(Store store) {
 		Random random = new Random(0);
 		Book[] lastSearchResults = new Book[0];
@@ -21,7 +20,7 @@ public abstract class RandomClient {
 			EventLogger.recordClientEnter();
 		
 			while (continueShopping()) {
-				long start = System.nanoTime();
+				long start = System.currentTimeMillis();
 				int action = random.nextInt(10000);
 				if (action == 0) {
 					if (lastSearchResults.length > 0) {
@@ -31,10 +30,10 @@ public abstract class RandomClient {
 				} else {
 					lastSearchResults = store.fulltextSearch(getSearchTerm());
 				}
-				long end = System.nanoTime();
-				long diffMicro = (end - start) / 1000;
-				if (diffMicro > SLA_REQUEST_COMPLETED_MICROSEC) {
-					EventLogger.recordViolation(diffMicro);
+				long end = System.currentTimeMillis();
+				long diffMillis = (end - start);
+				if (diffMillis > Constants.SLA_REQUEST_LENGTH_CLIENT_SIDE_MILLIS) {
+					EventLogger.recordViolation(diffMillis * 1000);
 				}
 				
 				beforeNextAction();

@@ -16,6 +16,7 @@ import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.None;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Predict;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Simple;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Strategy;
+import cz.cuni.mff.d3s.adapt.bookstore.services.Constants;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Replicable;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Store;
 
@@ -25,8 +26,6 @@ public class Monitor implements Runnable {
 	private final String BOOK_STORE_CLASS = "cz.cuni.mff.d3s.adapt.bookstore.store.SimpleBookStore";
 	private final String BOOK_STORE_INSTRUMENTED_METHOD = "fulltextSearch";
 	private final String PROBE_NAME = "class:" + BOOK_STORE_CLASS.replace('.', '/') + "#" + BOOK_STORE_INSTRUMENTED_METHOD;
-	
-	private final long SLA_MAX_RESPONSE_TIME_MICROSEC = 8000;
 	
 	@Requires
 	private Replicable replicable;
@@ -47,7 +46,7 @@ public class Monitor implements Runnable {
 		
 		Measurement measurement = MeasurementStorage.getBackend();
 		for (Strategy s : strategies.values()) {
-			s.init(measurement, PROBE_NAME, SLA_MAX_RESPONSE_TIME_MICROSEC, replicable);
+			s.init(measurement, PROBE_NAME, Constants.SLA_REQUEST_LENGTH_SERVER_SIDE_MILLIS * 1000, replicable);
 		}
 		
 		controller = new Controller(store, replicable, strategies);
