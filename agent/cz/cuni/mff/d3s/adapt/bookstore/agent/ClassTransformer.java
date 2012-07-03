@@ -48,14 +48,14 @@ public class ClassTransformer implements ClassFileTransformer {
 			throws IllegalClassFormatException {
 		try {
 			if (actuallyTransform) {
-				boolean isBuiltIn = classname.startsWith("java.") || classname.startsWith("javax.") || classname.startsWith("sun.");
+				boolean isBuiltIn = classname.startsWith("java/") || classname.startsWith("javax/") || classname.startsWith("sun/");
 				
 				if (!isBuiltIn && InstrumentationAgent.DEBUG) {
 						System.err.printf("ClassTransformer.transform(%s)\n",
 								classname);
 				}
 				
-				if (!classname.startsWith("cz.")) {
+				if (!classname.startsWith("cz/")) {
 					return bytecode;
 				}
 			
