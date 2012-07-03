@@ -91,6 +91,10 @@ public class Controller {
 		victim.stop();
 		clients.remove(victim);
 	}
+	
+	public synchronized int getClientCount() {
+		return clients.size();
+	}
 
 	public synchronized Strategy getStrategy() {
 		assert currentStrategy != null;

@@ -118,6 +118,14 @@ public class NanoHTTPD
 			}
 		}
 		
+		if (uri.startsWith("/STATUS/")) {
+			String id = uri.replace("/STATUS/", "");
+			if (id.equals("client-count")) {
+				String clientCountStr = String.format("%d", controller.getClientCount());
+				return new Response(HTTP_OK, "text/plain", clientCountStr);
+			}
+		}
+		
 		Enumeration e = header.propertyNames();
 		while ( e.hasMoreElements())
 		{

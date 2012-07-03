@@ -122,10 +122,9 @@ public class Graphs {
 			DataTable violationsData = violations.getData();
 			DataTable clientsData = clients.getData();
 			
-			XYPlot plot = new XYPlot(violationsData, clientsData);
+			XYPlot plot = new XYPlot(violationsData);
 			
 			setLinesOnly(plot, violationsData, Color.RED);
-			setLinesOnly(plot, clientsData, Color.BLUE);
 			
 			return plotToPngStream(plot);
 		}
