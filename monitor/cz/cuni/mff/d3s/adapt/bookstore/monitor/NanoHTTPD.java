@@ -124,6 +124,10 @@ public class NanoHTTPD
 				String clientCountStr = String.format("%d", controller.getClientCount());
 				return new Response(HTTP_OK, "text/plain", clientCountStr);
 			}
+			if (id.equals("instance-count")) {
+				String instanceCountStr = String.format("%d", controller.getInstanceCount());
+				return new Response(HTTP_OK, "text/plain", instanceCountStr);
+			}
 		}
 		
 		Enumeration e = header.propertyNames();

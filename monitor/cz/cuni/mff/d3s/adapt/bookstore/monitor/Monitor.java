@@ -50,7 +50,7 @@ public class Monitor implements Runnable {
 			s.init(measurement, PROBE_NAME, SLA_MAX_RESPONSE_TIME_MICROSEC, replicable);
 		}
 		
-		controller = new Controller(store, strategies);
+		controller = new Controller(store, replicable, strategies);
 		try {
 			webserver = new NanoHTTPD(8888, new File("../wwwroot/").getAbsoluteFile(), graphs, controller);
 		} catch (IOException e) {

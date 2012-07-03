@@ -13,7 +13,9 @@ $(document).ready(function() {
 	setInterval(function() {
 		$("#indicator-client-count").load("/STATUS/client-count?"+ new Date().getTime());
 	}, 1000);
-	
+	setInterval(function() {
+		$("#indicator-instance-count").load("/STATUS/instance-count?"+ new Date().getTime());
+	}, 1000);
 });
 
 
@@ -27,6 +29,8 @@ $(document).ready(function() {
 <dl>
 	<dt>Current number of clients</dt>
 		<dd id="indicator-client-count">?</dd>
+	<dt>Current number of instances</dt>
+		<dd id="indicator-instance-count">?</dd>
 </dl>
 
 <img id="main-graph" src="/GRAPH/all.png" />

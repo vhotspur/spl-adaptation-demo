@@ -8,6 +8,7 @@ import java.util.Set;
 import cz.cuni.mff.d3s.adapt.bookstore.client.RandomClient;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.None;
 import cz.cuni.mff.d3s.adapt.bookstore.monitor.strategies.Strategy;
+import cz.cuni.mff.d3s.adapt.bookstore.services.Replicable;
 import cz.cuni.mff.d3s.adapt.bookstore.services.Store;
 
 public class Controller {
@@ -59,14 +60,16 @@ public class Controller {
 	}
 	
 	private Store store;
+	private Replicable replicable;
 	
 	private Set<UserDrivenClient> clients = new HashSet<>();
 
 	private Map<String, Strategy> strategies;
 	private Strategy currentStrategy;
 	
-	public Controller(Store store, Map<String, Strategy> strategies) {
+	public Controller(Store store, Replicable replicable, Map<String, Strategy> strategies) {
 		this.store = store;
+		this.replicable = replicable;
 		this.strategies = strategies;
 		currentStrategy = getDefaultStrategy();
 	}
@@ -94,6 +97,10 @@ public class Controller {
 	
 	public synchronized int getClientCount() {
 		return clients.size();
+	}
+	
+	public int getInstanceCount() {
+		return replicable.getInstanceCount();
 	}
 
 	public synchronized Strategy getStrategy() {
