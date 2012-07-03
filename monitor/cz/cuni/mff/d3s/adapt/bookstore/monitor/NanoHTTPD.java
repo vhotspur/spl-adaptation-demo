@@ -297,6 +297,14 @@ public class NanoHTTPD
 		catch ( IOException ioe ) {}
 		catch ( InterruptedException e ) {}
 	}
+	
+	private static class NullOutputStream extends OutputStream {
+
+		@Override
+		public void write(int b) throws IOException {
+			/* Do nothing. */
+		}
+	}
 
 	/**
 	 * Handles one session, i.e. parses the HTTP request
@@ -1078,7 +1086,7 @@ public class NanoHTTPD
 	private static int theBufferSize = 16 * 1024;
 
 	// Change these if you want to log to somewhere else than stdout
-	protected static PrintStream myOut = System.out; 
+	protected static PrintStream myOut = new PrintStream(new NullOutputStream()); 
 	protected static PrintStream myErr = System.err;
 
 	/**
