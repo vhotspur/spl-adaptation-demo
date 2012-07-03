@@ -59,6 +59,11 @@ public class MultithreadedDatabase implements Database, Replicable {
 		addToPoolSize(-1);
 	}
 	
+	@Override
+	public synchronized int getInstanceCount() {
+		return threadPool.getCorePoolSize();
+	}
+	
 	private synchronized void addToPoolSize(int amount) {
 		int oldSize = threadPool.getCorePoolSize();
 		int newSize = oldSize + amount;
