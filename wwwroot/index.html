@@ -5,16 +5,22 @@
 <title>SPL-based performance adaptability</title>
 <script type="text/javascript" src="/jquery.js"></script>
 <script type="text/javascript">
+
+function loadIntoElement(element, url) {
+	$(element).text("?");
+	$(element).load(url + "?" + new Date().getTime());
+}
+
 $(document).ready(function() {
 	setInterval(function() {
 		$("#main-graph").attr("src", "/GRAPH/all.png?" + new Date().getTime());
 	}, 1000);
 	
 	setInterval(function() {
-		$("#indicator-client-count").load("/STATUS/client-count?"+ new Date().getTime());
+		loadIntoElement("#indicator-client-count", "/STATUS/client-count")
 	}, 1000);
 	setInterval(function() {
-		$("#indicator-instance-count").load("/STATUS/instance-count?"+ new Date().getTime());
+		loadIntoElement("#indicator-instance-count", "/STATUS/instance-count")
 	}, 1000);
 });
 
